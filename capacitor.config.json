@@ -1,0 +1,10 @@
+{
+  "appId": "io.github.echotrigger.chatroam",
+  "appName": "Roam",
+  "webDir": "dist",
+  "server": {
+    "hostname": "localhost",
+    "androidScheme": "https"
+  },
+  "loggingBehavior": "none"
+}

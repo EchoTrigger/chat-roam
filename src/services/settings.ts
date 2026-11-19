@@ -1,15 +1,18 @@
 import { create } from 'zustand'
 import type { TtsVoice } from './api/speech.js'
 import { normalizeLocation, type UserLocation } from './location.js'
+import { isNativeApiKey, nativeApiKey } from './native-api-key.js'
 
 export type Locale = 'zh-CN' | 'en-US'
 
 /** 主题偏好；默认跟随系统 */
 export type ThemePreference = 'light' | 'dark' | 'system'
 
-/** 本机设置，存 localStorage：API Key、语言、主题、位置、朗读音色、深度思考与智能搜索开关、侧边栏收起状态 */
+/** 常规设置存 localStorage，Android 的 API Key 使用原生安全存储。 */
 type Settings = {
   apiKey: string | null
+  apiKeyReady: boolean
+  apiKeyLoadFailed: boolean
   locale: Locale
   themePreference: ThemePreference
   location: UserLocation | null
@@ -88,7 +91,9 @@ const initialThemePreference = (): ThemePreference => {
 const initialTtsVoice = (): TtsVoice => (read(KEYS.ttsVoice) === 'tide' ? 'tide' : 'stella')
 
 export const useSettings = create<Settings>(() => ({
-  apiKey: read(KEYS.apiKey),
+  apiKey: isNativeApiKey ? null : read(KEYS.apiKey),
+  apiKeyReady: !isNativeApiKey,
+  apiKeyLoadFailed: false,
   locale: initialLocale(),
   location: initialLocation(),
   themePreference: initialThemePreference(),
@@ -119,9 +124,39 @@ export const setTtsVoice = (ttsVoice: TtsVoice) => {
   useSettings.setState({ ttsVoice })
 }
 
-export const setApiKey = (apiKey: string | null) => {
-  write(KEYS.apiKey, apiKey)
-  useSettings.setState({ apiKey })
+let apiKeyQueue = Promise.resolve()
+let apiKeyInitialization: Promise<void> | undefined
+
+const queueApiKeyOperation = (operation: () => Promise<void>) => {
+  const task = apiKeyQueue.then(operation)
+  apiKeyQueue = task.catch(() => {})
+  return task
+}
+
+export const initializeApiKey = async (): Promise<void> => {
+  if (!isNativeApiKey) {
+    return
+  }
+  apiKeyInitialization ??= queueApiKeyOperation(async () => {
+    const { value } = await nativeApiKey.get()
+    useSettings.setState({ apiKey: value, apiKeyReady: true, apiKeyLoadFailed: false })
+  }).catch(() => {
+    apiKeyInitialization = undefined
+    useSettings.setState({ apiKeyReady: true, apiKeyLoadFailed: true })
+  })
+  return apiKeyInitialization
+}
+
+export const setApiKey = async (apiKey: string | null): Promise<void> => {
+  if (!isNativeApiKey) {
+    write(KEYS.apiKey, apiKey)
+    useSettings.setState({ apiKey })
+    return
+  }
+  await queueApiKeyOperation(async () => {
+    await nativeApiKey.set({ value: apiKey })
+    useSettings.setState({ apiKey, apiKeyReady: true, apiKeyLoadFailed: false })
+  })
 }
 
 export const setThinking = (thinking: boolean) => {

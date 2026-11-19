@@ -21,6 +21,7 @@ type ApiKeyEditor = ReturnType<typeof useApiKeyEditor>
 export const ApiKeyField = ({ editor }: { editor: ApiKeyEditor }) => {
   const t = useTranslate()
   const isMobile = useIsMobile()
+  const apiKeyLoadFailed = useSettings((state) => state.apiKeyLoadFailed)
   const { apiKey, editing, setEditing, form, showInput } = editor
 
   return (
@@ -77,7 +78,9 @@ export const ApiKeyField = ({ editor }: { editor: ApiKeyEditor }) => {
             ) : null}
           </div>
         )}
-        {showInput && form.error ? <div className={styles.error}>{form.error}</div> : null}
+        {showInput && (form.error || apiKeyLoadFailed) ? (
+          <div className={styles.error}>{form.error ?? t('apiKeyLoadFailed')}</div>
+        ) : null}
       </div>
     </div>
   )

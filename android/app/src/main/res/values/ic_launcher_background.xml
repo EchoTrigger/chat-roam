@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#FFFFFF</color>
+    <item type="mipmap" name="ic_launcher">@drawable/roam_icon_legacy</item>
+    <item type="mipmap" name="ic_launcher_round">@drawable/roam_icon_legacy</item>
+</resources>

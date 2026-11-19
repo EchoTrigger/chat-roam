@@ -105,6 +105,8 @@ export const zh = {
   confirm: '确定',
   apiKeyInvalid: 'API Key 无效，请检查后重试',
   apiKeyVerificationFailed: '校验失败：{message}',
+  apiKeyLoadFailed: '无法读取已保存的 API Key。',
+  apiKeySaveFailed: '无法在本机保存 API Key，请重试。',
   historyImport: '导入历史对话',
   historyImportConfirm: '确认导入',
   historyImportConfirmTitle: '确认导入历史对话？',

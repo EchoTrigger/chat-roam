@@ -110,6 +110,8 @@ export const en = {
   confirm: 'Confirm',
   apiKeyInvalid: 'Invalid API Key. Please check it and try again.',
   apiKeyVerificationFailed: 'Verification failed: {message}',
+  apiKeyLoadFailed: 'Could not read the saved API Key.',
+  apiKeySaveFailed: 'Could not save the API Key on this device. Please try again.',
   historyImport: 'Import chat history',
   historyImportConfirm: 'Import',
   historyImportConfirmTitle: 'Import chat history?',

@@ -17,7 +17,11 @@ export const closeSettings = () => useSettingsDialog.setState({ open: false })
 
 /** 没有 API Key 时打开设置并选中 API Key 所在的「数据管理」，返回是否已有 Key */
 export const ensureApiKey = () => {
-  if (useSettings.getState().apiKey) {
+  const { apiKey, apiKeyReady } = useSettings.getState()
+  if (!apiKeyReady) {
+    return false
+  }
+  if (apiKey) {
     return true
   }
   openSettings('data')

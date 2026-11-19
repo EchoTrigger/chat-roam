@@ -9,23 +9,25 @@ export const useApiKeyForm = (onSaved?: () => void) => {
   const t = useTranslate()
   const [value, setValue] = useState('')
   const [verifying, setVerifying] = useState(false)
-  const [failure, setFailure] = useState<{ cause: unknown } | null>(null)
-  const cause = failure?.cause
+  const [failure, setFailure] = useState<{ cause: unknown } | 'save' | null>(null)
+  const cause = failure === 'save' ? undefined : failure?.cause
   const error =
     failure === null
       ? null
-      : classifyApiError(cause) === 'unauthorized'
-        ? t('apiKeyInvalid')
-        : classifyApiError(cause) === 'network'
-          ? t('commonNetworkErrorToast')
-          : t('apiKeyVerificationFailed', {
-              message:
-                cause instanceof ApiError && cause.localMessage
-                  ? t(cause.localMessage.key, cause.localMessage.params)
-                  : cause instanceof Error
-                    ? cause.message
-                    : String(cause),
-            })
+      : failure === 'save'
+        ? t('apiKeySaveFailed')
+        : classifyApiError(cause) === 'unauthorized'
+          ? t('apiKeyInvalid')
+          : classifyApiError(cause) === 'network'
+            ? t('commonNetworkErrorToast')
+            : t('apiKeyVerificationFailed', {
+                message:
+                  cause instanceof ApiError && cause.localMessage
+                    ? t(cause.localMessage.key, cause.localMessage.params)
+                    : cause instanceof Error
+                      ? cause.message
+                      : String(cause),
+              })
 
   const submit = async () => {
     const apiKey = value.trim()
@@ -36,7 +38,12 @@ export const useApiKeyForm = (onSaved?: () => void) => {
     setFailure(null)
     try {
       await verifyApiKey(apiKey)
-      setApiKey(apiKey)
+      try {
+        await setApiKey(apiKey)
+      } catch {
+        setFailure('save')
+        return
+      }
       setValue('')
       onSaved?.()
     } catch (e) {
