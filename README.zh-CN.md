@@ -73,3 +73,7 @@ src/
 ## 许可证
 
 [MIT](LICENSE)。构建会将许可证复制到 `dist/LICENSE`，分发时请一并保留；第三方依赖遵循各自的许可证。
+
+## chat-roam
+
+chat-roam基于[DeepSeek chat-demo](https://github.com/deepseek-ai/chat-demo)。把网页导出的聊天ZIP导入手机，填上API Key就能接着聊。

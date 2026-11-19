@@ -73,3 +73,7 @@ src/
 ## License
 
 [MIT](LICENSE). The build copies the license to `dist/LICENSE`; include it when distributing the app. Third-party dependencies are subject to their own licenses.
+
+## chat-roam
+
+chat-roam is based on [DeepSeek chat-demo](https://github.com/deepseek-ai/chat-demo). Import your web chat export ZIP on Android and enter your API key to pick up where you left off.
